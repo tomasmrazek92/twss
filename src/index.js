@@ -5,18 +5,38 @@ gsap.defaults({ ease: Power1.easeOut, duration: 0.8 });
 $(document).ready(() => {
   // #region Nav
 
-  let navCircle = $('.nav_brand-logo._1');
-  let navText = $('.nav_brand-logo._2');
+  function debounce(func, wait) {
+    let timeout;
+    return function (...args) {
+      const later = () => {
+        clearTimeout(timeout);
+        func.apply(this, args);
+      };
+      clearTimeout(timeout);
+      timeout = setTimeout(later, wait);
+    };
+  }
+
+  let isFixed = false;
+
   let tl = gsap.timeline({
     scrollTrigger: {
       trigger: $('.nav_wrapper'),
       start: () => '10px top',
-      onEnter: () => {
-        $('.nav').addClass('fixed');
-      },
-      onLeaveBack: () => {
-        $('.nav').removeClass('fixed');
-      },
+      end: 'bottom top',
+      markers: true,
+      onEnter: debounce(() => {
+        if (!isFixed) {
+          isFixed = true;
+          $('.nav').addClass('fixed');
+        }
+      }, 200), // Adjust the debounce delay as needed
+      onLeaveBack: debounce(() => {
+        if (isFixed) {
+          isFixed = false;
+          $('.nav').removeClass('fixed');
+        }
+      }, 200), // Adjust the debounce delay as needed
     },
   });
 
@@ -270,5 +290,43 @@ $(document).ready(() => {
 
   gsapReset();
 
+  // #endregion
+
+  // #region Helpers
+  $(document).ready(function () {
+    $('[data-copy]').on('click', function () {
+      let type = $(this).attr('data-copy');
+      console.log(type);
+
+      if (type === 'url') {
+        copyClipboard($(this), $(location).attr('href'));
+      } else {
+        copyClipboard($(this), type);
+      }
+    });
+
+    function copyClipboard(el, val) {
+      // Paste here
+      var $temp = $('<input>');
+      var ogIcon = $(el).find('.w-embed:first-child');
+      var label = $(el).find('.w-embed:last-child');
+      let timeOut;
+
+      // Click
+      $('body').append($temp);
+      $temp.val(val).select();
+      document.execCommand('copy');
+      $temp.remove();
+
+      clearTimeout(timeOut); // Corrected the function name and variable consistency
+      label.hide();
+      ogIcon.hide();
+      label.css('display', 'flex');
+      timeOut = setTimeout(() => {
+        label.hide();
+        ogIcon.css('display', 'flex');
+      }, 2000);
+    }
+  });
   // #endregion
 });
