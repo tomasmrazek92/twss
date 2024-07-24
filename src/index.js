@@ -24,7 +24,6 @@ $(document).ready(() => {
       trigger: $('.nav_wrapper'),
       start: () => '10px top',
       end: 'bottom top',
-      markers: true,
       onEnter: debounce(() => {
         if (!isFixed) {
           isFixed = true;
@@ -296,7 +295,6 @@ $(document).ready(() => {
   $(document).ready(function () {
     $('[data-copy]').on('click', function () {
       let type = $(this).attr('data-copy');
-      console.log(type);
 
       if (type === 'url') {
         copyClipboard($(this), $(location).attr('href'));
