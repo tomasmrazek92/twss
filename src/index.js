@@ -2,6 +2,7 @@ import { initSwipers } from './utils/globalFunctions';
 import { gridFade, imageReveal } from './utils/reusableAnimations';
 
 gsap.defaults({ ease: Power1.easeOut, duration: 0.8 });
+
 $(document).ready(() => {
   // #region Nav
 
@@ -178,7 +179,7 @@ $(document).ready(() => {
       // properties
       let realIndex = $(this).eq(0).index();
       let stagger = trigger.attr('data-stagger') || 0.2;
-      let start = trigger.attr('data-start') || isDesktop ? '50% bottom' : '20% bottom';
+      let start = trigger.attr('data-start') || isDesktop ? 'top 80%' : 'top 70%';
 
       let tl = gsap.timeline({
         scrollTrigger: {
@@ -219,8 +220,10 @@ $(document).ready(() => {
           let masks = $(this).find('.vertical-mask');
           let img = $(this).find('img');
 
-          tlSmall.from(masks.eq(0), { yPercent: 100, duration: 1, ease: Power2.easeOut }, '<');
-          tlSmall.from(masks.eq(1), { yPercent: -100, duration: 1, ease: Power2.easeOut }, '<');
+          gsap.set(masks, { y: 0, yPercent: 0 });
+
+          tlSmall.to(masks.eq(0), { yPercent: -100, duration: 1, ease: Power2.easeOut }, '<');
+          tlSmall.to(masks.eq(1), { yPercent: 100, duration: 1, ease: Power2.easeOut }, '<');
           tlSmall.from(img, { scale: 1.2 }, '<');
 
           tl.add(tlSmall, '<');
@@ -237,7 +240,19 @@ $(document).ready(() => {
 
           let img = $(this).find('img');
 
-          tlSmall.from(mask, { xPercent: 100, duration: 2, ease: Power2.easeOut }, '<');
+          gsap.set(mask, { x: 0, xPercent: 0 });
+
+          tlSmall.to(
+            mask,
+            {
+              xPercent: -100,
+              duration: 2,
+              ease: Power2.easeOut,
+              force3D: true,
+            },
+            '<'
+          );
+
           tlSmall.from(img, { scale: 1.2, duration: 2 }, '<');
 
           tl.add(tlSmall, '<');
@@ -289,6 +304,35 @@ $(document).ready(() => {
 
   gsapReset();
 
+  // #endregion
+
+  // #region YT Videos
+  $('[data-yt-video="trigger"]').on('click', function () {
+    let self = $(this);
+    let overlay = self.find('[data-yt-video="overlay"]');
+    console.log(overlay);
+    let embedIframe = self.find('.w-embed-youtubevideo').find('iframe');
+    let iframeSrc = embedIframe.attr('src');
+
+    let flag = 'revelead';
+
+    // Update URL
+    function updateAutoplay(url) {
+      let urlObj = new URL(url);
+      urlObj.searchParams.set('autoplay', '1');
+      return urlObj.toString();
+    }
+
+    let updatedUrl = updateAutoplay(iframeSrc);
+
+    // Update Visual
+    if (!self.hasClass(flag)) {
+      self.addClass(flag);
+
+      overlay.hide();
+      embedIframe.attr('src', updatedUrl);
+    }
+  });
   // #endregion
 
   // #region Helpers
