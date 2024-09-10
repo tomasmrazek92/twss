@@ -18,23 +18,21 @@ $(document).ready(() => {
     };
   }
 
-  let isFixed = false;
+  let isFixed = sessionStorage.getItem('navbarState');
+
+  if (isFixed) {
+    $('.nav').removeClass('large');
+  }
 
   let tl = gsap.timeline({
     scrollTrigger: {
       trigger: $('.nav_wrapper'),
       start: () => '10px top',
       end: 'bottom top',
-      onEnter: debounce(() => {
+      onLeave: debounce(() => {
         if (!isFixed) {
-          isFixed = true;
-          $('.nav').addClass('fixed');
-        }
-      }, 200), // Adjust the debounce delay as needed
-      onLeaveBack: debounce(() => {
-        if (isFixed) {
-          isFixed = false;
-          $('.nav').removeClass('fixed');
+          isFixed = sessionStorage.setItem('navbarState', 'true');
+          $('.nav').removeClass('large');
         }
       }, 200), // Adjust the debounce delay as needed
     },
@@ -222,8 +220,8 @@ $(document).ready(() => {
 
           gsap.set(masks, { y: 0, yPercent: 0 });
 
-          tlSmall.to(masks.eq(0), { yPercent: -100, duration: 1, ease: Power2.easeOut }, '<');
-          tlSmall.to(masks.eq(1), { yPercent: 100, duration: 1, ease: Power2.easeOut }, '<');
+          tlSmall.to(masks.eq(0), { yPercent: -100, duration: 1.5, ease: 'power3.inOut' }, '<');
+          tlSmall.to(masks.eq(1), { yPercent: 100, duration: 1.5, ease: 'power3.inOut' }, '<');
           tlSmall.from(img, { scale: 1.2 }, '<');
 
           tl.add(tlSmall, '<');
@@ -246,8 +244,8 @@ $(document).ready(() => {
             mask,
             {
               xPercent: -100,
-              duration: 2,
-              ease: Power2.easeOut,
+              duration: 1.7,
+              ease: 'power3.inOut',
               force3D: true,
             },
             '<'
